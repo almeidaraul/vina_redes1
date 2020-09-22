@@ -27,6 +27,8 @@ int ConexaoRawSocket(char *device);
 #include <dirent.h>
 
 //common.cpp
+extern int server_sequence, client_sequence;
+
 void send_(std::string s);
 
 std::string receive_();
