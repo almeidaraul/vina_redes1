@@ -1,12 +1,9 @@
 all:
-	g++ client.cpp common.cpp ConexaoRawSocket.c -o client
-	g++ server.cpp common.cpp ConexaoRawSocket.c -o server
+	g++ client.cpp common.cpp ConexaoRawSocket.c -o _client.out
+	g++ server.cpp common.cpp ConexaoRawSocket.c -o _server.out
 
 client: all
-	@sudo ./client
+	@sudo ./_client.out
 
 server: all
-	@sudo ./server
-
-test:
-	g++ teste.cpp && ./a.out
+	@sudo ./_server.out
