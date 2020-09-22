@@ -27,14 +27,39 @@ int ConexaoRawSocket(char *device);
 #include <dirent.h>
 
 //common.cpp
-extern int server_sequence, client_sequence;
+#define T_CD 0
+#define T_LS 1
+#define T_VER 2
+#define T_LINHA 3
+#define T_LINHAS 4
+#define T_EDIT 5
+#define T_ACK 8
+#define T_NACK 9
+#define T_LINHASIF 10 //linhas inicial e final
+#define T_LSC 11 //conteudo ls
+#define T_ARQC 12 //conteudo arquivo
+#define T_FIM 13 //fim da transmissao
+#define T_ERR 15 //erro
+
+extern int my_seq, their_seq;
 
 void send_(std::string s);
 
 std::string receive_();
 
-std::string format(std::string s);
+void send_status(std::string s);
+
+std::string format(std::string s, int type);
 
 void read_formatted(std::string s);
 
+int get_parity(std::string m, int end_of_data);
+
+int get_type(std::string m);
+
+int get_sequence(std::string m);
+
+int get_size(std::string m);
+
+std::string _itos(int val, int sz);
 #endif
