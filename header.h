@@ -27,6 +27,9 @@ int ConexaoRawSocket(char *device);
 #include <dirent.h>
 
 //common.cpp
+#include <chrono>
+#include <thread>
+
 #define T_CD 0
 #define T_LS 1
 #define T_VER 2
@@ -41,7 +44,7 @@ int ConexaoRawSocket(char *device);
 #define T_FIM 13 //fim da transmissao
 #define T_ERR 15 //erro
 
-extern int my_seq, their_seq;
+extern int my_seq, their_seq, c;
 
 void send_(std::string s);
 
@@ -49,9 +52,15 @@ std::string receive_();
 
 void send_status(std::string s);
 
+std::string receive_status();
+
 std::string format(std::string s, int type);
 
+int parity(std::string s);
+
 void read_formatted(std::string s);
+
+std::string get_data(std::string s, int end_of_data);
 
 int get_parity(std::string m, int end_of_data);
 

@@ -5,30 +5,33 @@ int my_seq = 0;
 int their_seq = 0;
 
 void send_(string s) {
-	char a[] = "lo";
-	int c = ConexaoRawSocket(a);
-
 	while (s.length() < 22) s += " ";
 	const char *m = s.c_str();
 
-	write(c, m, strlen(m));
+	do {
+		write(c, m, strlen(m));
+	} while (receive_status() == "nack");
 }
 
 string receive_() {
-	char a[] = "lo";
-	int c = ConexaoRawSocket(a);
-
 	char buffer[1024] = {0};
-	int valread;
-	read(c, buffer, 1024);
+	while (!strlen(buffer))
+		recv(c, buffer, 1024, 0);
 
 	string received(buffer);
+	
+	bool sequence_ok = get_sequence(received) == their_seq;
+	bool parity_ok = parity(received) == get_parity(received, get_size(received)+8);
+	bool type_ok = (get_type(received) != T_ACK) && (get_type(received) != T_NACK);
 
-	if (get_sequence(received) != their_seq) {
+	if (!sequence_ok || !parity_ok) {
 		send_status("nack");
+		return receive_();
 	}
+	if (!type_ok)
+		return receive_();
 	their_seq = (their_seq+1)%256;
-
+	send_status("ack");
 	return received;
 }
 
@@ -36,13 +39,19 @@ void send_status(string s) {
 	int type = s == "nack" ? T_NACK : T_ACK;
 	string m = format(s, type);
 
-	char a[] = "lo";
-	int c = ConexaoRawSocket(a);
-
 	while (m.length() < 22) m += " ";
 	const char *msg = m.c_str();
 
 	write(c, msg, strlen(msg));
+}
+
+string receive_status() {
+	char buffer[1024] = {0};
+	while (!strlen(buffer))
+		recv(c, buffer, 1024, 0);
+	string received(buffer);
+	int type = get_type(received);
+	return (type == T_ACK ? "ack" : "nack");
 }
 
 string format(string s, int type) {
@@ -54,10 +63,20 @@ string format(string s, int type) {
 
 	string type_string = _itos(type, 2); //"07";
 	f += sz + sequence + type_string + s;
-	string parity = _itos(880, 3); //"880";
+	f.push_back('p');
+	int parity_calc = parity(f);
+	string parity = _itos(parity_calc, 3); //"880";
+	f.pop_back();
 	f += parity;
 	
 	return f;
+}
+
+int parity(string s) {
+	unsigned char p = 0;
+	for (int i = 1; i < 8+get_size(s)-1; i++)
+		p ^= s[i];
+	return int(p);
 }
 
 void read_formatted(string s) {
@@ -73,12 +92,16 @@ void read_formatted(string s) {
 
 	int end_of_data = get_size(s)+8;
 
-	cout << "Data: ";
-	for (int i = 8; i < end_of_data; i++)
-		cout << s[i];
-	cout << endl;
+	cout << "Data: " << get_data(s, end_of_data) << endl;
 
 	cout << "Parity: " << get_parity(s, end_of_data) << endl;
+}
+
+string get_data(string s, int end_of_data) {
+	string m = "";
+	for (int i = 8; i < end_of_data; i++)
+		m.push_back(s[i]);
+	return m;
 }
 
 int get_parity(string m, int end_of_data) {

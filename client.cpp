@@ -1,14 +1,18 @@
 #include "header.h"
 using namespace std;
 
-int main() {
-	string f = "";
-	f = format(f, T_CD);
-	read_formatted(f);
-	send_(f);
+char a[] = "lo";
+int c = ConexaoRawSocket(a);
 
-	//lendo o nack:
-	string r = receive_();
-	read_formatted(r);
+int main() {
+	int k = 1;
+	string f;
+	while (k < 20) {
+		f = _itos(k, 2); //f = ""; funciona perfeitamente
+		f = format(f, T_CD);
+		//read_formatted(f);
+		send_(f);
+		k++;
+	}
 	return 0;
 }
