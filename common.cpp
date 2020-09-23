@@ -178,3 +178,20 @@ string _itos(int val, int sz) {
 	}
 	return r;
 }
+
+vector<string> divide(string s, int sz) {
+	int i = 0;
+	vector<string> pieces;
+	while (i < s.length()) {
+		string p = "";
+		for (int j = i; (j < s.length()) && (j < i+sz); j++) {
+			p.push_back(s[j]);
+		}
+		pieces.push_back(p);
+		i += sz;
+	}
+	if (s.length() <= sz)
+		pieces.push_back(s);
+
+	return pieces;
+}

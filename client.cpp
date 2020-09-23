@@ -59,8 +59,10 @@ int main() {
 				file =  "";
 				while ((j < args.length()) && (args[j] != ' '))
 					file.push_back(args[j++]); 
-			} else { //or new text for given line:
-				extra.push_back('"');
+			} //or new text for given line:
+			else if (cmd == "edit") {
+				j = 0;
+				while ((j < args.length()) && (args[j++] != '"'));
 				while ((j < args.length()) && (args[j] != '"'))
 					extra.push_back(args[j++]);
 			}
@@ -75,6 +77,15 @@ int main() {
 			send_(msg);
 
 			//send new text
+			if (cmd == "edit") {
+				vector<string> divided_text = divide(extra, 15);
+				for (int p = 0; p < divided_text.size(); p++) {
+					msg = format(divided_text[p], T_ARQC);
+					send_(msg); 
+				}
+				msg = format("", T_FIM);
+				send_(msg);
+			}
 		}
 		else {
 			//get type for cmd

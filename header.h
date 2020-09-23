@@ -71,4 +71,6 @@ int get_sequence(std::string m);
 int get_size(std::string m);
 
 std::string _itos(int val, int sz);
+
+std::vector<std::string> divide(std::string s, int sz);
 #endif
