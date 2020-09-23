@@ -15,8 +15,19 @@ void send_(string s) {
 
 string receive_() {
 	char buffer[1024] = {0};
-	while (!strlen(buffer))
+	bool keep_receiving = true;
+	const clock_t begin_time = clock();
+	while (keep_receiving) {
 		recv(c, buffer, 1024, 0);
+		bool buffer_empty =  !strlen(buffer);
+		bool old_seq = get_sequence(string(buffer)) < their_seq;
+		bool time_ok = float(clock() - begin_time)/CLOCKS_PER_SEC < 5;
+		if (!time_ok) {
+			send_status("nack");
+			return receive_();
+		}
+		keep_receiving = time_ok && (buffer_empty || old_seq);
+	}
 
 	string received(buffer);
 	
@@ -25,6 +36,9 @@ string receive_() {
 	bool type_ok = (get_type(received) != T_ACK) && (get_type(received) != T_NACK);
 
 	if (!sequence_ok || !parity_ok) {
+		cout << "seq recebida: " << get_sequence(received) << ", esperada: " << their_seq << endl;
+		cout << "erro em " << received << endl;
+		cout << "s ok: " << sequence_ok << ", p ok: " << parity_ok << endl;
 		send_status("nack");
 		return receive_();
 	}
@@ -47,9 +61,20 @@ void send_status(string s) {
 
 string receive_status() {
 	char buffer[1024] = {0};
-	while (!strlen(buffer))
+	bool keep_receiving = true;
+	bool time_ok = true;
+	const clock_t begin_time = clock();
+	while (keep_receiving && time_ok) {
 		recv(c, buffer, 1024, 0);
+		int received_type = get_type(string(buffer));
+		keep_receiving = !strlen(buffer) || ((received_type != T_ACK) && (received_type != T_NACK));
+		if (float(clock()-begin_time)/CLOCKS_PER_SEC > 5)
+			time_ok = false;
+	}
+	if (!time_ok) return "nack";
 	string received(buffer);
+	their_seq = (their_seq+1)%256;
+
 	int type = get_type(received);
 	return (type == T_ACK ? "ack" : "nack");
 }
