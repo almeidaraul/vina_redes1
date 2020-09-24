@@ -57,7 +57,6 @@ void send_status(string s) {
 	const char *msg = m.c_str();
 
 	write(c, msg, strlen(msg));
-	//my_seq = (my_seq+1)%256;
 }
 
 string receive_status() {
