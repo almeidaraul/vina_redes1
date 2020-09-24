@@ -25,9 +25,15 @@ int main() {
 
 		//do something with cmd and args
 		if (cmd == "lls" || cmd == "lcd") {
-			cout << cmd << args << endl;
+			if (cmd == "lls") {
+				vector<string> output = ls();
+				for (auto part : output)
+					cout << part;
+			}
+			else
+				cd(args);
 		}
-		else if (cmd == "linha" || cmd == "linhas" || cmd == "edit") {
+		else { if (cmd == "linha" || cmd == "linhas" || cmd == "edit") {
 			//get type from cmd
 			int type;
 			if (cmd == "linha")
@@ -116,6 +122,7 @@ int main() {
 				response = receive_();
 			} while (get_type(response) != T_FIM);
 			cout << output_data << endl;
+		}
 		}
 		cout << "[client]: ";
 	}

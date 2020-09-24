@@ -45,8 +45,6 @@ int main() {
 			}
 		} else { 
 			args = get_data(r, get_size(r)+8);
-			//cout << type << endl;
-			//cout << args << endl;
 		}
 
 		//prepare for output 
@@ -55,19 +53,35 @@ int main() {
 		int error = 0;
 		//execute command and get output
 		switch (type) {
+			case T_CD:
+				error = cd(args);
+				break;
 			case T_LS:
-				output.push_back("die erfrischungsgetränke");
+				output = ls();
 				break;
 			case T_VER:
-				output.push_back("eeeeeeeeita coisa boaaaaaaaaaaa\nmas tem ate duas linhas po que coisa boaaaaaa\nbom demais ohm...\nhehe");
+				output = ver(filename);
+				if (output.size() == 1) {
+					if ((output[0][0] == '~') && (output[0][1] == 'E'))
+						error = output[0][1]-'0';
+				}
 				break;
-			case T_LINHA:
-				output.push_back("eeeeeeeeita coisa boaaaaaaaaaaa\nmas tem ate duas linhas po que coisa boaaaaaa\nbom demais ohm...\nhehe");
+			case T_LINHA: {
+				int linha_numero_1 = stoi(line1);
+				output = linhas(linha_numero_1, linha_numero_1, filename);
 				break;
-			case T_LINHAS:
-				for (int i = 0; i < 100; i++)
-				output.push_back("eeeeeeeeita coisa boaaaaaaaaaaa\nmas tem ate duas linhas po que coisa boaaaaaa\nbom demais ohm...\nhehe");
+			}
+			case T_LINHAS: {
+				int linha_numero_1 = stoi(line1);
+				int linha_numero_2 = stoi(extra);
+				output = linhas(linha_numero_1, linha_numero_2, filename);
 				break;
+			}
+			case T_EDIT: {
+				int linha_numero_1 = stoi(line1);
+				error = edit(extra, linha_numero_1, filename);
+				break;
+			}
 			default:
 				break;
 		}
@@ -92,6 +106,80 @@ int main() {
 			response = format("", T_FIM);
 			send_(response);
 		}
+	}
+	return 0;
+}
+
+vector<string> ver(string user_input) {
+	string filename = user_input;
+	string line;
+	ifstream file(filename);
+
+	vector<string> output;
+
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			output.push_back(line+'\n');
+		}
+		file.close();
+	}
+	else {
+		output.push_back("~E"+3);
+	}
+	return output;
+}
+
+vector<string> linhas(int line_1, int line_N, string filename) {
+	string line;
+	ifstream file(filename);
+
+	vector<string> output;
+
+	int current_line = 1;
+
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			if (current_line >= line_1 && current_line <= line_N)
+				output.push_back(line+'\n');
+			current_line++;
+		}
+		file.close();
+	}
+	else {
+		cerr << "Unable to open file " << filename << endl;
+	}
+	return output;
+}
+
+int edit(string user_input, int edited_line, string filename) {
+	string new_text = user_input;
+	string line;
+	vector<string> file_text;
+
+	//read whole file into file_text
+	ifstream rfile(filename);
+	if (rfile.is_open()) {
+		while (getline(rfile,line)) {
+			file_text.push_back(line);
+		}
+		rfile.close();
+	}
+	else {
+		cerr << "Unable to open file " << filename << endl;
+	}
+
+	//edit desired line
+	file_text[edited_line-1] = new_text;
+
+	//write edited file
+	ofstream wfile(filename);
+	if (wfile.is_open()) {
+		for (auto line : file_text)
+			wfile << line << endl;
+		wfile.close();
+	}
+	else {
+		cerr << "Unable to open file " << filename << endl;
 	}
 	return 0;
 }

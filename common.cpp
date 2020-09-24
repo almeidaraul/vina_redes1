@@ -193,3 +193,31 @@ vector<string> divide(string s, int sz) {
 
 	return pieces;
 }
+
+vector<string> ls() {
+	DIR* dirp = opendir(".");
+	struct dirent * dp;
+	vector<string> files;
+	while ((dp = readdir(dirp)) != NULL) {
+		files.push_back(dp->d_name);
+	}
+	closedir(dirp);
+	vector<string> output;
+	for (auto f : files) {
+		if ((f != ".") && (f != ".."))
+			output.push_back(f+'\n');
+	}
+	return output;
+}
+
+int cd(string dir) {
+	int cv = chdir(dir.c_str());
+	if (cv) {
+		if (errno == EACCES)
+			return 1;
+		else
+			return 2;
+	}
+	else
+		return 0;
+}

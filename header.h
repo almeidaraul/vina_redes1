@@ -26,6 +26,10 @@ int ConexaoRawSocket(char *device);
 #include <unistd.h>
 #include <dirent.h>
 
+//server.cpp
+std::vector<std::string> ver(std::string user_input);
+
+int edit(std::string user_input, int edited_line, std::string filename);
 //common.cpp
 #include <chrono>
 #include <thread>
@@ -73,4 +77,10 @@ int get_size(std::string m);
 std::string _itos(int val, int sz);
 
 std::vector<std::string> divide(std::string s, int sz);
+
+std::vector<std::string> ls();
+
+std::vector<std::string> linhas(int line_1, int line_N, std::string filename);
+
+int cd(std::string dir);
 #endif
