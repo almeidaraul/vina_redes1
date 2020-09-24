@@ -20,7 +20,7 @@ string receive_() {
 	while (keep_receiving) {
 		recv(c, buffer, 1024, 0);
 		bool buffer_empty =  !strlen(buffer);
-		bool old_seq = get_sequence(string(buffer)) < their_seq;
+		bool old_seq = get_sequence(string(buffer)) != their_seq;
 		bool time_ok = float(clock() - begin_time)/CLOCKS_PER_SEC < 5;
 		if (!time_ok) {
 			send_status("nack");
@@ -190,8 +190,6 @@ vector<string> divide(string s, int sz) {
 		pieces.push_back(p);
 		i += sz;
 	}
-	if (s.length() <= sz)
-		pieces.push_back(s);
 
 	return pieces;
 }

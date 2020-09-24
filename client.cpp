@@ -14,6 +14,8 @@ int main() {
 		int i = 0;
 		while ((i < input.length()) && (input[i] != ' '))
 			cmd.push_back(input[i++]);
+		
+		bool has_output = (cmd != "cd") && (cmd != "edit");
 
 		string args = "";
 		if ((i < input.length()) && (input[i] == ' '))
@@ -96,32 +98,27 @@ int main() {
 				type = T_LS;
 			else if (cmd == "ver")
 				type = T_VER;
-			else if (cmd == "linha")
-				type = T_LINHA;
-			else if (cmd == "linhas")
-				type = T_LINHAS;
-			else if (cmd == "edit")
-				type = T_EDIT;
 
 			//send message w/ args and type
 			string msg = format(args, type);
 			send_(msg);
 		}
+		//get output
+		string response = receive_();
+		//check for error
+		if (get_type(response) == T_ERR) {
+			cout << "erro" << endl;
+		} else if (has_output) { //not cd and not edit
+			string output_data = "";
+			//while not at end of transmission, get data
+			do {
+				output_data += get_data(response, get_size(response)+8);
+				response = receive_();
+			} while (get_type(response) != T_FIM);
+			cout << output_data << endl;
+		}
 		cout << "[client]: ";
 	}
 	cout << "(end of input)" << endl;
-	/*
-	int k = 0;
-	string f, r;
-	while (k < 31) {
-		f = _itos(k+1, 2); //f = ""; funciona perfeitamente
-		f = format(f, T_CD);
-		send_(f);
-
-		f = receive_();
-		k = stoi(get_data(f, get_size(f)+8));
-		cout << k << endl;
-	}
-	*/
 	return 0;
 }
