@@ -113,7 +113,28 @@ int main() {
 		string response = receive_();
 		//check for error
 		if (get_type(response) == T_ERR) {
-			cout << "erro" << endl;
+			int ei = 0;
+			string ed = get_data(response, get_size(response)+8);
+			while ((ed[ei] <= '0') || (ed[ei] >= '5'))
+				ei++;
+			ei = ed[ei];
+			switch (ei) {
+				case '1':
+					cout << "E1: acesso proibido / sem permissão" << endl;
+					break;
+				case '2':
+					cout << "E2: diretório inexistente" << endl;
+					break;
+				case '3':
+					cout << "E3: arquivo inexistente" << endl;
+					break;
+				case '4':
+					cout << "E4: linha inexistente" << endl;
+					break;
+				default:
+					cout << "Erro" << endl;
+					break;
+			}
 		} else if (has_output) { //not cd and not edit
 			string output_data = "";
 			//while not at end of transmission, get data

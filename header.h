@@ -30,6 +30,10 @@ int ConexaoRawSocket(char *device);
 std::vector<std::string> ver(std::string user_input);
 
 int edit(std::string user_input, int edited_line, std::string filename);
+
+std::vector<std::string> linhas(int line_1, int line_N, std::string filename);
+
+int count_lines(std::string filename);
 //common.cpp
 #include <chrono>
 #include <thread>
@@ -79,8 +83,6 @@ std::string _itos(int val, int sz);
 std::vector<std::string> divide(std::string s, int sz);
 
 std::vector<std::string> ls();
-
-std::vector<std::string> linhas(int line_1, int line_N, std::string filename);
 
 int cd(std::string dir);
 #endif

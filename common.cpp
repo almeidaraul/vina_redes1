@@ -57,6 +57,7 @@ void send_status(string s) {
 	const char *msg = m.c_str();
 
 	write(c, msg, strlen(msg));
+	//my_seq = (my_seq+1)%256;
 }
 
 string receive_status() {
@@ -195,14 +196,19 @@ vector<string> divide(string s, int sz) {
 }
 
 vector<string> ls() {
+	vector<string> output;
+
 	DIR* dirp = opendir(".");
+	if (!dirp) {
+		output.push_back("~E1");
+		return output;
+	}
 	struct dirent * dp;
 	vector<string> files;
 	while ((dp = readdir(dirp)) != NULL) {
 		files.push_back(dp->d_name);
 	}
 	closedir(dirp);
-	vector<string> output;
 	for (auto f : files) {
 		if ((f != ".") && (f != ".."))
 			output.push_back(f+'\n');

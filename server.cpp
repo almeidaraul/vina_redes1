@@ -58,23 +58,38 @@ int main() {
 				break;
 			case T_LS:
 				output = ls();
+				if (output.size() == 1)
+					if ((output[0][0] == '~') && (output[0][1] == 'E'))
+						error = 1;
 				break;
-			case T_VER:
-				output = ver(filename);
+			case T_VER: {
+				int klines = count_lines(filename);
+				//cout << klines << endl;
+				//output = ver(filename);
+				output = linhas(-1, 0, filename);
 				if (output.size() == 1) {
 					if ((output[0][0] == '~') && (output[0][1] == 'E'))
-						error = output[0][1]-'0';
+						error = output[0][2]-'0';
 				}
 				break;
+			}
 			case T_LINHA: {
 				int linha_numero_1 = stoi(line1);
 				output = linhas(linha_numero_1, linha_numero_1, filename);
+				if (output.size() == 1) {
+					if ((output[0][0] == '~') && (output[0][1] == 'E'))
+						error = output[0][2]-'0';
+				}
 				break;
 			}
 			case T_LINHAS: {
 				int linha_numero_1 = stoi(line1);
 				int linha_numero_2 = stoi(extra);
 				output = linhas(linha_numero_1, linha_numero_2, filename);
+				if (output.size() == 1) {
+					if ((output[0][0] == '~') && (output[0][1] == 'E'))
+						error = output[0][2]-'0';
+				}
 				break;
 			}
 			case T_EDIT: {
@@ -99,7 +114,9 @@ int main() {
 				vector<string> divided_text = divide(output[i], 15);
 				for (int p = 0; p < divided_text.size(); p++) {
 					response = format(divided_text[p], output_type);
+					//cout << "vou enviar " << response << endl;
 					send_(response);
+					//cout << "enviei\n";
 				}
 			}
 			//then, send an end of transmission message
@@ -114,8 +131,12 @@ vector<string> ver(string user_input) {
 	string filename = user_input;
 	string line;
 	ifstream file(filename);
-
 	vector<string> output;
+
+	if (!file.good()) {
+		output.push_back("~E3");
+		return output;
+	}
 
 	if (file.is_open()) {
 		while (getline(file, line)) {
@@ -124,7 +145,7 @@ vector<string> ver(string user_input) {
 		file.close();
 	}
 	else {
-		output.push_back("~E"+3);
+		output.push_back("~E1");
 	}
 	return output;
 }
@@ -132,21 +153,31 @@ vector<string> ver(string user_input) {
 vector<string> linhas(int line_1, int line_N, string filename) {
 	string line;
 	ifstream file(filename);
+	bool all_lines = line_1 == -1;
 
 	vector<string> output;
+
+	if (!file.good()) {
+		output.push_back("~E3");
+		return output;
+	}
 
 	int current_line = 1;
 
 	if (file.is_open()) {
-		while (getline(file, line)) {
-			if (current_line >= line_1 && current_line <= line_N)
+		while (getline(file, line) && (all_lines || current_line <= line_N)) {
+			if (current_line >= line_1 && (all_lines || current_line <= line_N))
 				output.push_back(line+'\n');
 			current_line++;
 		}
 		file.close();
 	}
 	else {
-		cerr << "Unable to open file " << filename << endl;
+		output.push_back("~E1");
+	}
+	if ((current_line < line_1) || (current_line < line_N)) {
+		output.clear();
+		output.push_back("~E4");
 	}
 	return output;
 }
@@ -158,6 +189,11 @@ int edit(string user_input, int edited_line, string filename) {
 
 	//read whole file into file_text
 	ifstream rfile(filename);
+
+	if (!rfile.good()) {
+		return 3;
+	}
+
 	if (rfile.is_open()) {
 		while (getline(rfile,line)) {
 			file_text.push_back(line);
@@ -165,10 +201,12 @@ int edit(string user_input, int edited_line, string filename) {
 		rfile.close();
 	}
 	else {
-		cerr << "Unable to open file " << filename << endl;
+		return 1;
 	}
 
 	//edit desired line
+	if (edited_line-1 > file_text.size())
+		return 4;
 	file_text[edited_line-1] = new_text;
 
 	//write edited file
@@ -179,7 +217,19 @@ int edit(string user_input, int edited_line, string filename) {
 		wfile.close();
 	}
 	else {
-		cerr << "Unable to open file " << filename << endl;
+		return 3;
 	}
 	return 0;
+}
+
+int count_lines(string filename) {
+	int kline = 0;
+	string line;
+	ifstream f(filename);
+	if (f.is_open()) {
+		while (getline(f, line))
+			kline++;
+		f.close();
+	}
+	return kline;
 }
