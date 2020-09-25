@@ -36,9 +36,9 @@ string receive_() {
 	bool type_ok = (get_type(received) != T_ACK) && (get_type(received) != T_NACK);
 
 	if (!sequence_ok || !parity_ok) {
-		cout << "seq recebida: " << get_sequence(received) << ", esperada: " << their_seq << endl;
-		cout << "erro em " << received << endl;
-		cout << "s ok: " << sequence_ok << ", p ok: " << parity_ok << endl;
+		//cout << "seq recebida: " << get_sequence(received) << ", esperada: " << their_seq << endl;
+		//cout << "erro em " << received << endl;
+		//cout << "s ok: " << sequence_ok << ", p ok: " << parity_ok << endl;
 		send_status("nack");
 		return receive_();
 	}

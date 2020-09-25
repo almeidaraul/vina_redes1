@@ -5,6 +5,7 @@ char a[] = "lo";
 int c = ConexaoRawSocket(a);
 
 int main() {
+	cout << "VINA - VIm Nas Alturas" << endl;
 	string input;
 	cout << "[client]: ";
 	while (getline(cin, input)) {

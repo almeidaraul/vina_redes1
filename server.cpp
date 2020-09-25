@@ -5,6 +5,7 @@ char a[] = "lo";
 int c = ConexaoRawSocket(a);
 
 int main() {
+	cout << "VINA - VIm Nas Alturas (servidor)" << endl;
 	string r;
 	int type;
 	string args;
@@ -114,9 +115,7 @@ int main() {
 				vector<string> divided_text = divide(output[i], 15);
 				for (int p = 0; p < divided_text.size(); p++) {
 					response = format(divided_text[p], output_type);
-					//cout << "vou enviar " << response << endl;
 					send_(response);
-					//cout << "enviei\n";
 				}
 			}
 			//then, send an end of transmission message
